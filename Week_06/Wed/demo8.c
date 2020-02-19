@@ -17,11 +17,12 @@ int main(int argc, char** argv)
     int tag = 0;
     random_seed();
 
-    int root = 0;
-    double x = random_number() + my_rank;                
-    printf("My x is %f\n",x);
+    int root = 7;
+    double x = my_rank;                
+    printf("Rank %d : My x is %f\n", my_rank, x);
+    // root is the sender (node 0)
     MPI_Bcast(&x,1,MPI_DOUBLE,root,MPI_COMM_WORLD);                
-    printf("Now my x is %f\n",x);
+    printf("Rank %d : Now my x is %f\n", my_rank, x);
 
     MPI_Finalize();
 }
