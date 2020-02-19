@@ -8,7 +8,7 @@ double integrand(double x)
     return pow((x-1),2)*exp(-pow(x,2));
 }
 
-void main(int argc, char** argv)
+int main(int argc, char** argv)
 {
     /* MPI variables */
     MPI_Status status;
@@ -41,8 +41,12 @@ void main(int argc, char** argv)
             int dest = p;
             intsub[0] = a + p*int_length;
             intsub[1] = a + (p+1)*int_length;
-            MPI_Send(intsub,2,MPI_DOUBLE,dest,tag,MPI_COMM_WORLD);
+            MPI_Send(
+                    intsub,2,MPI_DOUBLE,dest,tag,MPI_COMM_WORLD
+                    );
         }
+        intsub[0] = a;
+        intsub[1] = a + int_length;
     }
     else
     {
@@ -60,27 +64,28 @@ void main(int argc, char** argv)
     for(int i = 0; i < n_local; i++)
     {
         double x = intsub[0] + h*i;
-        integral += integrand(x);
+        integral += integrand(x)*h;
     }
-
-    int dest = 0;
-    MPI_Send(&integral,1,MPI_DOUBLE,dest,tag,MPI_COMM_WORLD);
+    // If not rank 0, don't need to send
+    if (my_rank != 0)
+    {
+        int dest = 0;
+        MPI_Send(&integral,1,MPI_DOUBLE,dest,tag,MPI_COMM_WORLD);
+    }
 
     if (my_rank == 0)
     {
         /* Compute integral */
         double total_sum = integral;
-        for(int p = 0; p < nprocs; p++)
+        for(int p = 1; p < nprocs; p++)
         {
             int source = p;
             double integral;
             MPI_Recv(&integral,1,MPI_DOUBLE,source,tag,MPI_COMM_WORLD,&status);
             total_sum += integral;
         }
-    }
-    if (my_rank == 0)
-    {        
-        double error = total_sum - 0.3041759198043616;
+
+        double error = fabs(total_sum - 0.3041759198043616);
         printf("%8d %24.16f %12.4e\n",N,total_sum, error);
     }
 
