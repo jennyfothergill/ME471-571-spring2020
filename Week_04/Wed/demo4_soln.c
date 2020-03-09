@@ -1,5 +1,5 @@
 #include "demo4.h"
-#include "demo_util.h"
+#include "array_util.h"
 
 #include <mpi.h>
 

@@ -24,7 +24,7 @@ int main(int argc, char** argv)
     set_rank(my_rank);  /* Needed to log printing */
 
     /* Total number of intervals */
-    int N = pow2(10);
+    int N = pow2(11);
 
     /* Interval over which to compute integral */
     double a = 0;
@@ -41,9 +41,13 @@ int main(int argc, char** argv)
             int dest = p;
             intsub[0] = a + p*int_length;
             intsub[1] = a + (p+1)*int_length;
+<<<<<<< HEAD
             MPI_Send(
                     intsub,2,MPI_DOUBLE,dest,tag,MPI_COMM_WORLD
                     );
+=======
+            MPI_Send(intsub,2,MPI_DOUBLE,dest,tag,MPI_COMM_WORLD);                
+>>>>>>> 3ef383a1dbd5c59753a8a87367255fd73a1d51e7
         }
         intsub[0] = a;
         intsub[1] = a + int_length;
@@ -59,12 +63,15 @@ int main(int argc, char** argv)
 
     /* solution : 0.3041759198043616 */
     int n_local = N/nprocs;
-    double integral = 0;
+    double x0 = intsub[0];
+    double x1 = intsub[1];
     double h = (b-a)/N;
-    for(int i = 0; i < n_local; i++)
+    double integral = 0.5*(integrand(x0) + integrand(x1))*h;
+    for(int i = 1; i < n_local; i++)
     {
         double x = intsub[0] + h*i;
         integral += integrand(x)*h;
+<<<<<<< HEAD
     }
     // If not rank 0, don't need to send
     if (my_rank != 0)
@@ -77,6 +84,14 @@ int main(int argc, char** argv)
     {
         /* Compute integral */
         double total_sum = integral;
+=======
+    }
+
+    double total_sum = integral;
+    if (my_rank == 0)
+    {
+        /* Compute integral */
+>>>>>>> 3ef383a1dbd5c59753a8a87367255fd73a1d51e7
         for(int p = 1; p < nprocs; p++)
         {
             int source = p;
@@ -84,7 +99,19 @@ int main(int argc, char** argv)
             MPI_Recv(&integral,1,MPI_DOUBLE,source,tag,MPI_COMM_WORLD,&status);
             total_sum += integral;
         }
+<<<<<<< HEAD
 
+=======
+    }
+    else
+    {
+        int dest = 0;
+        MPI_Send(&integral,1,MPI_DOUBLE,dest,tag,MPI_COMM_WORLD);
+    }
+
+    if (my_rank == 0)
+    {        
+>>>>>>> 3ef383a1dbd5c59753a8a87367255fd73a1d51e7
         double error = fabs(total_sum - 0.3041759198043616);
         printf("%8d %24.16f %12.4e\n",N,total_sum, error);
     }
@@ -92,4 +119,9 @@ int main(int argc, char** argv)
     /* Aggregate sum over each interval on root node */
 
     MPI_Finalize();
+<<<<<<< HEAD
 }
+=======
+    return 0;
+}
+>>>>>>> 3ef383a1dbd5c59753a8a87367255fd73a1d51e7

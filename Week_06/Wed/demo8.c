@@ -5,7 +5,10 @@
 
 int main(int argc, char** argv)
 {
+<<<<<<< HEAD
 
+=======
+>>>>>>> 3ef383a1dbd5c59753a8a87367255fd73a1d51e7
     MPI_Init(&argc, &argv);
 
     int my_rank;
@@ -14,9 +17,9 @@ int main(int argc, char** argv)
     int nprocs;
     MPI_Comm_size(MPI_COMM_WORLD, &nprocs);
 
-    int tag = 0;
     random_seed();
 
+<<<<<<< HEAD
     int root = 7;
     double x = my_rank;                
     printf("Rank %d : My x is %f\n", my_rank, x);
@@ -24,5 +27,17 @@ int main(int argc, char** argv)
     MPI_Bcast(&x,1,MPI_DOUBLE,root,MPI_COMM_WORLD);                
     printf("Rank %d : Now my x is %f\n", my_rank, x);
 
+=======
+    double x;                
+    if (my_rank == 0)
+    {
+        x = 3.14158;    
+    }
+    //printf("Rank %d : My value is %e\n",my_rank,x);
+    int root = 0;
+    MPI_Bcast(&x,1,MPI_DOUBLE,root,MPI_COMM_WORLD);         
+             
+    printf("Rank %d : Now my value is %f\n",my_rank,x);
+>>>>>>> 3ef383a1dbd5c59753a8a87367255fd73a1d51e7
     MPI_Finalize();
 }

@@ -5,9 +5,6 @@
 
 void main(int argc, char** argv)
 {
-    /* Data arrays */
-    double x;
-
     /* MPI variables */
     MPI_Status status;
 
@@ -26,16 +23,21 @@ void main(int argc, char** argv)
         /* Send a message to each proc! */
         for(int p = 1; p < nprocs; p++)
         {
+            int tag = 0;
             int dest = p;
             double x = random_number();
             printf("Sending %f to rank %d\n",x,p);
-            MPI_Send(x,3,MPI_DOUBLE,dest,tag,MPI_COMM_WORLD);
+            MPI_Send(&x,1,MPI_DOUBLE,dest,tag,MPI_COMM_WORLD);
+            printf("Done sending to processor %d\n",p);
         }
     }
-    else
+    else if (my_rank == 1)
     {
         int sender = 0;
-        MPI_Recv(x,1,MPI_DOUBLE,sender,tag,MPI_COMM_WORLD,&status);
+        double x;
+        int tag = 0;
+        printf("Processor %d is waiting to receive a message\n",my_rank);
+        MPI_Recv(&x,1,MPI_DOUBLE,sender,tag,MPI_COMM_WORLD,&status); 
         printf("Rank %d received %f\n",my_rank,x);
     }
 

@@ -34,7 +34,7 @@ void main(int argc, char** argv)
 
     if (my_rank == 0)
     {
-        random_array(n_global,&x);  
+        /* Compute integral */
         int p;
         for(p = 1; p < nprocs; p++)
         {
