@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-
+// include mpi
 #include <math.h>
 
 /* Initial condition */
@@ -11,6 +11,8 @@ double init(double x)
 
 int main(int argc, char** argv)
 {
+    //initialize mpi
+    
     /* ------------------------------ Input parameters -------------------------------- */
     int N = atoi(argv[1]);
     int nout = atoi(argv[2]);    
@@ -25,6 +27,7 @@ int main(int argc, char** argv)
     double dx = (b-a)/N;
     double dx2 = dx*dx;
 
+    // mpi - only rank 0 do this
     /* Write out meta data  */
     FILE *fout = fopen("heat.out","w");        
     fwrite(&N,1,sizeof(int),fout);
@@ -33,6 +36,10 @@ int main(int argc, char** argv)
 
     /* ---------------------------- Initialize solution ------------------------------- */
 
+    // distribute to number of processors 
+    // double m = N/nprocs;
+    // double *xmem = (double*) malloc((m+3)*sizeof(double));
+    // double *qmem = (double*) malloc((m+3)*sizeof(double));
     double *xmem = (double*) malloc((N+3)*sizeof(double));
     double *qmem = (double*) malloc((N+3)*sizeof(double));
 
@@ -40,8 +47,9 @@ int main(int argc, char** argv)
     double *x = &xmem[1];
     double *q = &qmem[1];
 
-    for(int i = -1; i < N+3; i++)
+    for(int i = -1; i < N+1; i++)
     {
+        // x[i] = a * my_rank + i*dx or something
         x[i] = a + i*dx;
         q[i] = init(x[i]);
     }
